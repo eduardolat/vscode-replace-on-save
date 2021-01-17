@@ -2,25 +2,101 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+interface Rule {
+  search: string;
+  replace: string;
+}
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "replace-on-save" is now active!');
+interface Replacement {
+  languageIdentifiers: string[];
+  rules: Rule[];
+}
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('replace-on-save.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
+function doReplacements(textLine: string, replacements: Replacement[], languageId: string): string {
+  if (textLine.length < 1) {
+    // Return if is a blank line
+    return textLine;
+  }
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Replace On Save!');
-	});
+  // Determine the rules for the languagueID
+  let rules: Rule[] = [];
+  replacements.forEach(replacement => {
+    if (replacement.languageIdentifiers.includes(languageId)) {
+      replacement.rules.forEach(rule => {
+        rules.push(rule);
+      });
+    }
+  });
 
-	context.subscriptions.push(disposable);
+  let finalTextLine = textLine;
+
+  rules.forEach(rule => {
+    finalTextLine = finalTextLine.replace(new RegExp(rule.search, 'g'), rule.replace);
+  });
+
+  return finalTextLine;
+}
+
+export function activate() {
+  console.log('Congratulations, your extension "Replace On Save" is now active!');
+
+  vscode.workspace.onWillSaveTextDocument((documentWillSave: vscode.TextDocumentWillSaveEvent) => {
+    // Get configurations
+    const enabled: boolean =
+      vscode.workspace.getConfiguration('replace-on-save').get('enabled') || false;
+
+    const replacements: Replacement[] =
+      vscode.workspace.getConfiguration('replace-on-save').get('replacements') || [];
+
+    // Load all language identifiers in the configuration file
+    let allLanguageIdentifiers: string[] = [];
+    replacements.forEach(replacement => {
+      replacement.languageIdentifiers.forEach(identifier => {
+        allLanguageIdentifiers.push(identifier);
+      });
+    });
+
+    const document = documentWillSave.document;
+
+    if (enabled && allLanguageIdentifiers.includes(document.languageId)) {
+      //
+      const lastLineLength = document.lineAt(document.lineCount - 1).text.length;
+
+      documentWillSave.waitUntil(
+        new Promise(resolve => {
+          let oldText: string = '';
+          let newText: string = '';
+
+          for (let lineNo = 0; lineNo < document.lineCount; lineNo++) {
+            if (lineNo > 0) {
+              oldText += '\n';
+              newText += '\n';
+            }
+            newText += doReplacements(
+              document.lineAt(lineNo).text,
+              replacements,
+              document.languageId,
+            );
+            oldText += document.lineAt(lineNo).text;
+          }
+
+          // Prevent no necesary changes
+          if (newText !== oldText) {
+            resolve([
+              vscode.TextEdit.insert(new vscode.Position(0, 0), newText),
+              vscode.TextEdit.delete(
+                new vscode.Range(
+                  new vscode.Position(0, 0),
+                  new vscode.Position(document.lineCount - 1, lastLineLength),
+                ),
+              ),
+            ]);
+          }
+          resolve([]);
+        }),
+      );
+    }
+  });
 }
 
 // this method is called when your extension is deactivated

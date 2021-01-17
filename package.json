@@ -1,8 +1,8 @@
 {
   "name": "replace-on-save",
   "displayName": "Replace On Save",
-  "description": "",
-  "version": "0.0.1",
+  "description": "Run a search and replace before saving a file, it also supports REGEX",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.52.0"
   },
@@ -10,16 +10,11 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:replace-on-save.helloWorld"
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "replace-on-save.helloWorld",
-        "title": "Hello World"
-      }
-    ]
+    "commands": []
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

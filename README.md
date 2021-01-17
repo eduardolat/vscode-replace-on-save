@@ -1,65 +1,77 @@
-# replace-on-save README
+# Replace On Save
 
-This is the README for your extension "replace-on-save". After writing up a brief description, we recommend including the following sections.
-
-## Features
-
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Run a search and replace before saving a file, it also supports REGEX for automation of content clean.
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+Settings can be user or workspace settings.
 
-For example:
+To configure it only in the current workspace, edit the `.vscode/settings.json` file relative to the root of the project and add the following settings:
 
-This extension contributes the following settings:
+```
+"replace-on-save": {
+  "enabled": true / false,
+  "replacements": [
+    {
+      "languageIdentifiers": ["plaintext", "javascriptreact", ...],
+      "rules": [
+        {
+          "search": "Search Text / JavaScript regex",
+          "replace": "Replace Text"
+        },
+        {
+          ...
+        }
+      ]
+    },
+    {
+      ...
+    }
+  ]
+}
+```
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+To see a list of language identifiers go to the following link:
+https://code.visualstudio.com/docs/languages/identifiers
 
-## Known Issues
+## Example Settings:
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+./.vscode/settings.json
+
+```
+"replace-on-save": {
+  "enabled": true,
+  "replacements": [
+    {
+      "languageIdentifiers": ["plaintext"],
+      "rules": [
+        {
+          "search": "dog", // This can be a valid javascript regular expression
+          "replace": "cat"
+        },
+        {
+          "search": "duck",
+          "replace": "chicken"
+        }
+      ]
+    },
+    {
+      "languageIdentifiers": ["javascriptreact", "jsx"],
+      "rules": [
+        {
+          "search": "class=\"",
+          "replace": "className=\""
+        }
+      ]
+    }
+  ]
+}
+```
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+Search and replace works correctly.
 
 ### 1.0.0
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release of Replace On Save
