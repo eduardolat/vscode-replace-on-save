@@ -1,5 +1,11 @@
 {
   "name": "replace-on-save",
+  "publisher": "EduardoDevop",
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eduardodevop/vscode-replace-on-save.git"
+  },
   "displayName": "Replace On Save",
   "description": "Run a search and replace before saving a file, it also supports REGEX",
   "version": "1.0.0",
